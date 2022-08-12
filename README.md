@@ -81,3 +81,61 @@ _jsxs("form", {
 You may have noticed that Babel (or any transformer you use) adds `import { jsx as _jsx } from "react/jsx-runtime";` to the top of every file. React uses `jsx` to transform what we give it into actual DOM elements.
 
 And this is where our fun begins because we can tell our transformer what to use as our JSX Runtime. By adding `/** @jsxImportSource ./myCustomerJSXRuntime */` to the top of _any_ Component file the transformer will pull the `jsx` function from `./myCustomerJSXRuntime/jsx-dev-runtime`.
+
+I don't have any intention of writing my own JSX function. I think what we get from React is plenty good. But would like to add a few things. So rather than come up with a new `jsx` I am trying to wrap it with additional functionality. I've written:
+
+```js
+import { jsx as _jsx } from 'react/jsx-runtime';
+
+import { isEnabled } from '../flagging';
+
+export const jsx = (el, props) => {
+  if (isEnabled(props['data-feat'])) return _jsx(el, props);
+  else return null;
+};
+```
+
+Essentially I've written a Feature Flagging utility. I am intercepting the props and determining if the element should render. For example, in normal situations you would write:
+
+```jsx
+{
+	isEnabled("new-input")
+      ? <input placeholder="New Input" />
+      : <input placeholder="Existing Input" />
+}
+```
+
+or
+
+```jsx
+<Toolbar>
+  {isEnabled("sandbox") && <NavButton to="sandbox">Sandbox</NavButton>}
+  <NavButton to="projects">Projects</NavButton>
+  <NavButton to="profile">Profile</NavButton>
+</Toolbar>
+```
+
+These are not bad by any means. But when you've got a lot of `isEnabled` thrown about, it can get noisy. By by moving the check into the `jsx` function, those two examples become:
+
+```jsx
+	<input data-feat="!new-input" placeholder="Existing Input" />
+	<input data-feat="new-input" placeholder="New Input" />
+```
+
+and
+
+```jsx
+<Toolbar>
+	<NavButton data-feat="sandbox" to="sandbox">Sandbox</NavButton>}
+  <NavButton to="projects">Projects</NavButton>
+  <NavButton to="profile">Profile</NavButton>
+</Toolbar>
+```
+
+As I mentioned above, I'm not 100% behind this yet, because it goes against the common conventions for what will and will not render. But there's more you could do beyond feature flagging. There are so many other possibilities! For example:
+
+- Intercept `children` and run translation on an element-by-element basis.
+
+- Tag elements for analytic tracking
+
+- ...
