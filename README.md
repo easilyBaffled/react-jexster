@@ -100,8 +100,8 @@ Essentially I've written a Feature Flagging utility. I am intercepting the props
 ```jsx
 {
 	isEnabled("new-input")
-      ? <input placeholder="New Input" />
-      : <input placeholder="Existing Input" />
+		? <input placeholder="New Input" />
+		: <input placeholder="Existing Input" />
 }
 ```
 
@@ -118,8 +118,8 @@ or
 These are not bad by any means. But when you've got a lot of `isEnabled` thrown about, it can get noisy. By by moving the check into the `jsx` function, those two examples become:
 
 ```jsx
-	<input data-feat="!new-input" placeholder="Existing Input" />
-	<input data-feat="new-input" placeholder="New Input" />
+<input data-feat="!new-input" placeholder="Existing Input" />
+<input data-feat="new-input" placeholder="New Input" />
 ```
 
 and
@@ -127,15 +127,13 @@ and
 ```jsx
 <Toolbar>
 	<NavButton data-feat="sandbox" to="sandbox">Sandbox</NavButton>}
-  <NavButton to="projects">Projects</NavButton>
-  <NavButton to="profile">Profile</NavButton>
+	<NavButton to="projects">Projects</NavButton>
+	<NavButton to="profile">Profile</NavButton>
 </Toolbar>
 ```
 
 As I mentioned above, I'm not 100% behind this yet, because it goes against the common conventions for what will and will not render. But there's more you could do beyond feature flagging. There are so many other possibilities! For example:
 
 - Intercept `children` and run translation on an element-by-element basis.
-
 - Tag elements for analytic tracking
-
 - ...
